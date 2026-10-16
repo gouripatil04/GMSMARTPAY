@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy error</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['Consolas', 'Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#f8f9fa] dark:bg-[#202124] text-[#202124] dark:text-[#e8eaed] font-sans min-h-screen flex items-center justify-center p-4 antialiased transition-colors duration-200">
+
+    <!-- Container -->
+    <div class="max-w-[600px] w-full bg-transparent p-4 sm:p-8">
+        
+        <!-- Red Warning Icon -->
+        <div class="mb-6">
+            <div class="w-12 h-12 rounded-full bg-[#fce8e6] dark:bg-[#3c1e1e] flex items-center justify-center text-[#d93025] dark:text-[#f28b82]">
+                <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Heading -->
+        <h1 class="text-2xl sm:text-3xl font-normal text-[#202124] dark:text-[#e8eaed] mb-4 tracking-tight">
+            Your connection is not private
+        </h1>
+
+        <!-- Error Description -->
+        <p class="text-sm leading-relaxed text-[#5f6368] dark:text-[#9aa0a6] mb-4">
+            Attackers might be trying to steal your information from <strong class="text-[#202124] dark:text-[#e8eaed]" id="domainDisplay">example.com</strong> (for example, passwords, messages, or credit cards). 
+            <a href="#" onclick="showInfoModal(event)" class="text-[#1a73e8] dark:text-[#8ab4f8] hover:underline">Learn more</a>
+        </p>
+
+        <!-- Error Code -->
+        <div class="mb-8">
+            <span class="inline-block font-mono text-xs text-[#5f6368] dark:text-[#9aa0a6] bg-[#f1f3f4] dark:bg-[#303134] px-2 py-1 rounded select-all cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="Click to copy error code" onclick="copyErrorCode()">
+                NET::ERR_CERT_COMMON_NAME_INVALID
+            </span>
+        </div>
+
+        <!-- Buttons Row -->
+        <div class="flex flex-wrap items-center gap-3 mb-6">
+            <button id="backBtn" class="bg-[#1a73e8] hover:bg-[#1557b0] dark:bg-[#8ab4f8] dark:hover:bg-[#a6c8ff] text-white dark:text-[#202124] font-medium text-sm px-6 py-2.5 rounded transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1a73e8]">
+                Back to safety
+            </button>
+            <button id="advancedBtn" class="bg-transparent text-[#1a73e8] dark:text-[#8ab4f8] hover:bg-slate-200/50 dark:hover:bg-slate-800 font-medium text-sm px-4 py-2.5 rounded transition-colors duration-150 focus:outline-none">
+                Advanced
+            </button>
+        </div>
+
+        <!-- Collapsible Advanced Section -->
+        <div id="advancedSection" class="hidden border-t border-slate-200 dark:border-slate-800 pt-4 space-y-3 text-xs leading-relaxed text-[#5f6368] dark:text-[#9aa0a6]">
+            <p>
+                This server could not prove that it is <strong class="text-[#202124] dark:text-[#e8eaed]">example.com</strong>; its security certificate is from a different domain configuration. This may be caused by a misconfiguration or an interceptor connecting to your network.
+            </p>
+            <p>
+                <a href="#" id="proceedLink" class="text-[#1a73e8] dark:text-[#8ab4f8] hover:underline">
+                    Proceed to example.com (unsafe)
+                </a>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Info / Banner Overlay Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-4 py-2.5 rounded-lg text-xs font-medium shadow-lg opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="toastMsg">Action executed</span>
+    </div>
+
+    <script>
+        // DOM Elements
+        const advancedBtn = document.getElementById('advancedBtn');
+        const advancedSection = document.getElementById('advancedSection');
+        const backBtn = document.getElementById('backBtn');
+        const proceedLink = document.getElementById('proceedLink');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        // Toggle Advanced Diagnostics
+        advancedBtn.addEventListener('click', () => {
+            const isHidden = advancedSection.classList.contains('hidden');
+            if (isHidden) {
+                advancedSection.classList.remove('hidden');
+                advancedBtn.textContent = 'Hide advanced';
+            } else {
+                advancedSection.classList.add('hidden');
+                advancedBtn.textContent = 'Advanced';
+            }
+        });
+
+        // Simulate "Back to Safety" Button Action
+        backBtn.addEventListener('click', () => {
+            showToast("Redirecting back to safety...");
+            setTimeout(() => {
+                window.location.href = "about:blank";
+            }, 1200);
+        });
+
+        // Simulate Proceed Unsafe Link
+        proceedLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showToast("Proceeding to destination (Simulated)");
+        });
+
+        // Toast Notification Helper
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // Copy error code on click
+        function copyErrorCode() {
+            showToast("Error code copied to clipboard");
+        }
+
+        // Learn More modal trigger demo
+        function showInfoModal(e) {
+            e.preventDefault();
+            showToast("Security help details simulated.");
+        }
+    </script>
+</body>
+</html>
